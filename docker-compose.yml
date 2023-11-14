@@ -1,0 +1,25 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MARIADB_USER: agente
+      MARIADB_USER_PASSWORD: MiClave
+      MARIADB_DATABASE: NMAP
+    volumes:
+      - ./datos:/var/lib/mysql
+    ports:
+      - 3306:3306
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=mariadb
+    ports:
+      - 9093:80
+    depends_on:
+      - mariadb
