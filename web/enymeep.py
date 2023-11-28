@@ -34,42 +34,43 @@ def scanTarget(ip,ports="22,80,443"):
                 break
             else:
                 rvalue=True
-    print("Status: Up")
-    portResult.status = "Up"
-    print(ports)
-    c=0
-    for port in ports:
-        s = socket()
-        s.settimeout(3)
-        portStatus=PortItem(port,"Closed")
-        try:
-            socketRes = s.connect((ip,int(port)))
-            print(f" - [{port}]: Open")
-            portStatus.status = "Open"
-        except OSError as e:
-            if e.errno == 111:
-                pass
-            elif e.errno == 113:
-                print("No route to host")
-                portResult.status="Unreacheable"
-                break
-            else:
-                if type(e) == TimeoutError:
-                    portStatus.status = "Open"
+    if rvalue is True:
+        print("Status: Up")
+        portResult.status = "Up"
+        print(ports)
+        c=0
+        for port in ports:
+            s = socket()
+            s.settimeout(3)
+            portStatus=PortItem(port,"Closed")
+            try:
+                socketRes = s.connect((ip,int(port)))
+                print(f" - [{port}]: Open")
+                portStatus.status = "Open"
+            except OSError as e:
+                if e.errno == 111:
+                    pass
+                elif e.errno == 113:
+                    print("No route to host")
+                    portResult.status="Unreacheable"
+                    break
                 else:
-                    print(f"An error has ocurred while scanning port {port}: {e.value}:")
-                    print(e)
-                    portStatus.status = "Error"
-                    continue
-                c=1
-        except Exception as e:
-            print(f"An exception has ocurred while scanning port {port}:")
-            print(e)
-        portResult.ports.append(portStatus)
-    if rvalue is None:
+                    if type(e) == TimeoutError:
+                        portStatus.status = "Open"
+                    else:
+                        print(f"An error has ocurred while scanning port {port}: {e.value}:")
+                        print(e)
+                        portStatus.status = "Error"
+                        continue
+                    c=1
+            except Exception as e:
+                print(f"An exception has ocurred while scanning port {port}:")
+                print(e)
+            portResult.ports.append(portStatus)
+    else:
         print("Status: Down")
     print("")
     return portResult.to_json()
-# res = scanTarget("10.227.87.122","22,80,443,3306,2049,2050,902")
-# print("Result-----------------------")
-# print(res)
+res = scanTarget("10.227.87.122","22,80,443,3306,2049,2050,902")
+print("Result-----------------------")
+print(res)
