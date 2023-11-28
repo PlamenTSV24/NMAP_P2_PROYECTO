@@ -7,6 +7,9 @@
     --active: #aeffd3;
     --input-bg: #414141;
     --container-bg: #252525;
+    --warn: #ffff4b;
+    --error: #ff4040;
+    --correct: #57ff57;
 }
 
 @font-face {
