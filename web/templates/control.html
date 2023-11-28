@@ -301,15 +301,15 @@
             return
         }
         dataArray.forEach(entry =>{
+            console.log(entry)
             const item = document.createElement("div")
             item.classList = "entry"
-            item.innerHTML=`<div class='entry-name'><p>IP: ${entry.ip} Ports: ${Object.keys(entry.ports)}</p><input type='button' onclick='showPorts(this)' data-object='${JSON.stringify(entry)}' value='Show'></div>`
+            item.innerHTML=`<div class='entry-name'><p>IP: ${entry.ip} Ports: ${entry.ports.map(a => a.port)}</p><input type='button' onclick='showPorts(this)' data-object='${JSON.stringify(entry)}' value='Show'></div>`
             const container = document.createElement("div")
             container.classList = "entry-data"
-            Object.entries(entry.ports).forEach(port =>{
-                const [num,status] = port;
+            entry.ports.forEach(port =>{
                 const portNode = document.createElement("p")
-                portNode.innerHTML =`Port: ${num} Status: ${status}`
+                portNode.innerHTML =`Port: ${port.port} Status: ${port.status}`
                 container.appendChild(portNode)
             })
             item.appendChild(container)
@@ -347,7 +347,7 @@
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then((response) => response.json())
-        .then((json) => rawResult(json));
+        .then((json) => drawResult([json]));
 
         //Get scan with values
         //Draw result with return
@@ -366,7 +366,7 @@
         tokens.innerText = 69
         drawFetched([{ip:"192.168.77.224",ports:[22,80,25]},{ip:"192.168.77.1",ports:[80,443]}])
         //v---- Delete on production
-        drawResult([{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}}]);
+        // drawResult([{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}}]);
     }
     window.onload=globalMain()
 </script>
