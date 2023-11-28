@@ -9,8 +9,8 @@ services:
       MARIADB_USER: agente
       MARIADB_USER_PASSWORD: MiClave
       MARIADB_DATABASE: NMAP
-    volumes:
-      - ./datos:/var/lib/mysql
+    # volumes:
+    #   - ./datos:/var/lib/mysql
     ports:
       - 3306:3306
   phpmyadmin:

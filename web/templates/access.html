@@ -108,6 +108,23 @@
     const changeMode = form.getElementsByTagName("p")[0]
     const submit = form.querySelectorAll("input[type=submit]")[0]
     
+    form.addEventListener("submit", async function(e) {
+        event.preventDefault();
+        const endpoint = "/"+e.target.action.split("/").pop();
+        const data = new FormData(e.target);
+        fetch(endpoint, {
+            method: "POST",
+            body: JSON.stringify({
+                username: data.get("username"),
+                password: data.get("password"),
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then((response) => response.json())
+        .then((json) => console.log(json));
+    });
+
     async function loadForm(){
         var mode = form.getAttribute("action")
         extra.style.maxHeight="0px"

@@ -22,12 +22,11 @@ def scanTarget(ip,ports="22,80,443"):
     rvalue=None
     ports=ports.split(",")
     portResult=ObjectResult(ip)
-    print(f"{ip}------")
-    for x in range(1,5,1):
-        # print(f"ping '{ip}' ... ", end="")
+    print(f"\n{ip}------")
+    for x in range(1,3,1):
         res = ping(ip, timeout=2)
         if res is None:
-            print("Timeout")
+            continue
         else:
             if res is False:
                 print("Too far")
@@ -35,25 +34,20 @@ def scanTarget(ip,ports="22,80,443"):
             else:
                 rvalue=True
     if rvalue is True:
-        print("Status: Up")
         portResult.status = "Up"
-        print(ports)
         c=0
         for port in ports:
             s = socket()
-            s.settimeout(3)
+            s.settimeout(2)
             portStatus=PortItem(port,"Closed")
             try:
                 socketRes = s.connect((ip,int(port)))
-                print(f" - [{port}]: Open")
                 portStatus.status = "Open"
             except OSError as e:
                 if e.errno == 111:
                     pass
                 elif e.errno == 113:
-                    print("No route to host")
                     portResult.status="Unreacheable"
-                    break
                 else:
                     if type(e) == TimeoutError:
                         portStatus.status = "Open"
@@ -61,16 +55,19 @@ def scanTarget(ip,ports="22,80,443"):
                         print(f"An error has ocurred while scanning port {port}: {e.value}:")
                         print(e)
                         portStatus.status = "Error"
-                        continue
                     c=1
+            except KeyboardInterrupt:
+                break
             except Exception as e:
                 print(f"An exception has ocurred while scanning port {port}:")
                 print(e)
             portResult.ports.append(portStatus)
     else:
-        print("Status: Down")
-    print("")
+        for port in ports:
+            portStatus=PortItem(port,"?")
+            portResult.ports.append(portStatus)
+    print(portResult.to_json())
     return portResult.to_json()
-res = scanTarget("10.227.87.122","22,80,443,3306,2049,2050,902")
-print("Result-----------------------")
-print(res)
+# res = scanTarget("10.227.87.122","22,80,443,3306,2049,2050,902")
+# print("Result-----------------------")
+# print(res)
