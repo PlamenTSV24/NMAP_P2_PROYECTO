@@ -40,6 +40,7 @@ def scanTarget(ip,ports="22,80,443"):
     c=0
     for port in ports:
         s = socket()
+        s.settimeout(3)
         portStatus=PortItem(port,"Closed")
         try:
             socketRes = s.connect((ip,int(port)))
