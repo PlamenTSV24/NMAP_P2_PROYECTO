@@ -11,7 +11,7 @@
 
 @font-face {
     font-family: Minecraft;
-    src: url('static/resources/Minecraft.ttf');
+    src: url('../static/resources/Minecraft.ttf');
 }
 body,html,#wrapper{
     font-family: Minecraft;
@@ -22,6 +22,14 @@ body,html,#wrapper{
 input{
     font-family: Minecraft;
     transition: .2s box-shadow, .2s text-shadow,background-color .2s;
+}
+img{
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 .text-input{
     /* border-radius: .5rem; */
