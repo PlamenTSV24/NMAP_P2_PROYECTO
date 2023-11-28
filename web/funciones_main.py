@@ -1,7 +1,6 @@
 from __future__ import print_function
 from __main__ import app
-from flask import Flask, redirect, render_template, session,request,make_response,jsonify
-from database import obtener_conexion
+from flask import render_template, session,request
 from funciones_db import verificar_credenciales,verificar_usuario,registrar_usuario
 from enymeep import scanTarget
 
@@ -15,33 +14,25 @@ def raiz():
 def login():
     requestLogin = request.get_json()
 
-    # try:
-    username_bd = verificar_credenciales(requestLogin['username'],requestLogin['password'])
+    try:
+        username_bd = verificar_credenciales(requestLogin['username'],requestLogin['password'])
 
-    if username_bd == False:
-        code = 406
-        res = {"status": code ,"mensaje":"Usuario/clave erroneo" }
+        if username_bd == False:
+            code = 406
+            res = {"status": code ,"mensaje":"Invalid username or password" }
+        
+        elif username_bd == True:
+            session["usuario"]=requestLogin['username']
+
+            return render_template ('control.html')
     
-    elif username_bd == True:
 
-        session["usuario"]=requestLogin['username']
-        session["usuario_bd"]=username_bd
+    except:
+        code=406
+        res={"status": code, "mensaje" : "An error has occurred while loading session"}
 
-        return render_template ('control.html')
-    
     return res
 
-    # except Exception as e:
-    #     print("Excepcion al validar al usuario")   
-    #     print (e)
-    #     ret={"status":"ERROR"}
-    #     code=500
-    #     return 'error', code
-
-#    else:
-#        ret={"status":"Bad request"}
-#        code=401
-    
 
 @app.route("/register",methods=['POST'])
 def registro():
@@ -51,16 +42,16 @@ def registro():
         user_exist = verificar_usuario(requestRegister['username'])
         if user_exist == True:
             code = 406
-            res = res = {"status": code ,"mensaje":"El usuario ya existe" }
+            res = res = {"status": code ,"mensaje":"User exists" }
 
         else:
-            registrar_usuario(requestRegister['username'],requestRegister['password'],)
+            registrar_usuario(requestRegister['username'],requestRegister['password'])
             code = 200
-            res = res = {"status": code , "mensaje":"Has sido registrado correctamente" }
+            res = res = {"status": code , "mensaje":"You have been registered successfully"}
 
     except:
         code = 406
-        res = res = {"status": code ,"mensaje":"No se ha podido registrar el usuario" }
+        res = res = {"status": code ,"mensaje":"An error has occurred while registering" }
 
     return res
 
