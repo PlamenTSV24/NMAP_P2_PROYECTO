@@ -1,6 +1,6 @@
 from __future__ import print_function
 from __main__ import app
-from flask import Flask, redirect, render_template, session,request
+from flask import Flask, redirect, render_template, session,request,make_response,jsonify
 from database import obtener_conexion
 from funciones_db import verificar_credenciales,verificar_usuario,registrar_usuario
 from enymeep import scanTarget
@@ -13,22 +13,23 @@ def raiz():
 
 @app.route("/login",methods=['GET', 'POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
+    requestLogin = request.get_json()
+
     # try:
-    username_bd = verificar_credenciales(username,password)
+    username_bd = verificar_credenciales(requestLogin['username'],requestLogin['password'])
 
     if username_bd == False:
-        ret = {"status": "ERROR","mensaje":"Usuario/clave erroneo" }
-        return ret
+        code = 406
+        res = {"status": code ,"mensaje":"Usuario/clave erroneo" }
     
     elif username_bd == True:
-        ret = {"status": "OK" }
 
-        session["usuario"]=username
+        session["usuario"]=requestLogin['username']
         session["usuario_bd"]=username_bd
-        code=200
+
         return render_template ('control.html')
+    
+    return res
 
     # except Exception as e:
     #     print("Excepcion al validar al usuario")   
@@ -44,33 +45,28 @@ def login():
 
 @app.route("/register",methods=['POST'])
 def registro():
-    username = request.form['username']
-    password = request.form['password']
-    password2 = request.form['password2']
-    print(username)
+    requestRegister = request.get_json()
+        
     try:
-        print("he entrado altry")
-        user_exist = verificar_usuario(username)
+        user_exist = verificar_usuario(requestRegister['username'])
         if user_exist == True:
-            print("estoy en el if")
+            code = 406
+            res = res = {"status": code ,"mensaje":"El usuario ya existe" }
 
-            print("el usuario ya existe 'haz lo que veas' ")
         else:
-            print("estoy en el else")
-            registrar_usuario(username,password,)
-            print("has sido registrado correctamente")
-
+            registrar_usuario(requestRegister['username'],requestRegister['password'],)
+            code = 200
+            res = res = {"status": code , "mensaje":"Has sido registrado correctamente" }
 
     except:
-        print("Error no se ha podido introducir el usuario")
-        
+        code = 406
+        res = res = {"status": code ,"mensaje":"No se ha podido registrar el usuario" }
+
+    return res
 
 @app.route("/enymeep",methods=['GET','POST'])
 def enymeep():
 
     requestBody = request.get_json()
     res = scanTarget(requestBody['address'], requestBody['ports'])
-
     return res
-
-
