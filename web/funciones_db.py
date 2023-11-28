@@ -22,53 +22,57 @@ def obtener_ip_por_nombre(nombre_maquina):
     else:
         return None  # Retorna None si no se encuentra la máquina
 
-def registrar_usuario(usuario, password, tokens):
+def registrar_usuario(usuario, password):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
     password_hasheada = obtener_hash(password)
     
-    query = "INSERT INTO usuarios (usuario, pass, tokens) VALUES (%s, %s, %s)"
+    query = "INSERT INTO usuarios (usuario, pass, tokens) VALUES (%s, %s, 30)"
 
-    cursor.execute(query, (usuario, password_hasheada, tokens))
+    cursor.execute(query, (usuario, password_hasheada))
     conexion.commit()
 
     cursor.close()
     conexion.close()
 
 
-def verificar_usuario(usuario):
+def verificar_usuario(usuario, returnPassword=False):
+    result = False
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    query = "SELECT usuario FROM usuarios WHERE usuario = %s"
+    query = "SELECT pass FROM usuarios WHERE usuario = %s"
     cursor.execute(query, (usuario,))
     resultado = cursor.fetchone()
 
-    if resultado:
+    if resultado is not None:
         cursor.close()
         conexion.close()
-        return True
+        if returnPassword: 
+            result = resultado[0]
+        else: 
+            result = True
+
     else:
         cursor.close()
         conexion.close()
-        return False
+
+    return result
 
 
 def verificar_credenciales(usuario, password):
-    resultado = verificar_usuario(usuario)
-
+    result = False
+    resultado = verificar_usuario(usuario, True)
     if resultado:
-        password_hasheada_bd = resultado[0]
+
+        password_hasheada_bd = resultado
         password_hasheada_ingresada = obtener_hash(password) 
 
         if password_hasheada_bd == password_hasheada_ingresada:
-            
-            return True
-        else:
-            return False
-    else:
-        return False
+            result = True
+
+    return result
 
     
 
