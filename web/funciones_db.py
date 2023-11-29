@@ -42,7 +42,7 @@ def verificar_usuario(usuario, returnPassword=False):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    query = "SELECT pass FROM usuarios WHERE usuario = %s"
+    query = "SELECT pass, tokens FROM usuarios WHERE usuario = %s"
     cursor.execute(query, (usuario,))
     resultado = cursor.fetchone()
 
@@ -50,7 +50,7 @@ def verificar_usuario(usuario, returnPassword=False):
         cursor.close()
         conexion.close()
         if returnPassword: 
-            result = resultado[0]
+            result = resultado
         else: 
             result = True
 
@@ -66,11 +66,11 @@ def verificar_credenciales(usuario, password):
     resultado = verificar_usuario(usuario, True)
     if resultado:
 
-        password_hasheada_bd = resultado
+        password_hasheada_bd = resultado[0]
         password_hasheada_ingresada = obtener_hash(password) 
 
         if password_hasheada_bd == password_hasheada_ingresada:
-            result = True
+            result = resultado[1]
 
     return result
 
@@ -87,6 +87,22 @@ def restar_token(usuario):
 
     cursor.close()
     conexion.close()
+
+def cambiar_pass(usuario,nueva):
+    nueva = obtener_hash(nueva)
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    res = False
+    query = "UPDATE usuarios SET pass = %s WHERE usuario = %s"
+    cursor.execute(query, (nueva,usuario))
+    try:
+        conexion.commit()
+        res=True
+    except:
+        pass
+    cursor.close()
+    conexion.close()
+    return res
 
 def borrar_usuario(usuario):
     conexion = obtener_conexion()

@@ -134,7 +134,7 @@
     
         }
         #fetched div p, #result div p{
-            width: 300px;
+            width: 600px;
             line-height: 57px;
             margin: 0 0 0 15px;
         }
@@ -168,22 +168,28 @@
         }
         #result .entry{
             flex-direction: column;
-            padding-right: 0;
+            margin: 0 20px;
+        }
+        #result .entry .entry-name input{
+            right: -8px;
         }
         #result .entry-data{
             padding: 0 20px;
             max-height: 0;
             display: flex;
-            transition: max-height ease-out .5s;
+            transition: max-height ease-out .5;
             overflow-x: hidden;
         }
         #result .entry-data.show{
             max-height: 100vh;
             transition: max-height ease-out 2s;
             flex-wrap: wrap;
+            background-color: rgba(0,0,0,.1);
         }
         #result .entry-data p{
             white-space: nowrap;
+            width: auto;
+            margin-right: 30px;
         }
         @media only screen and (max-width: 1000px) {
             #container {
@@ -197,6 +203,7 @@
             #fetched div input, #result .entry-name input{
                 position: relative;
                 margin-top: 0;
+                max-height: 36px;
             }
             #fetched div p, .entry-name p{
                 text-align: center;
@@ -256,6 +263,8 @@
     const pwdForm = document.getElementById("pwd-form")
     const username = document.getElementById("username")
     const tokens = document.getElementById("tokens")
+    const user = '{{user}}'
+    const userTokens = '{{tokens}}'
     var menuOpen = 0;
 
     navItem.addEventListener("click",async e =>{
@@ -275,7 +284,11 @@
         };
         document.addEventListener("click", closeMen);
     })
-
+    function logout(){
+        pwdForm.method = "GET"
+        pwdForm.action = "/"
+        pwdForm.submit()
+    }
     function changePwd(button){
         pwdForm.style.zIndex = "1"
         pwdForm.classList.add("open")
@@ -331,12 +344,12 @@
     function sendScan(target){
         var values = []
         if (target instanceof Array){
-            values.push(target)
+            values = target
         }else if (target instanceof HTMLInputElement) {
             let pelement = target.parentNode.getElementsByTagName("p")[0].innerText.split(" ");
             values.push(pelement[1],pelement[3])
         }
-        console.log(values)
+        
         fetch("/enymeep", {
             method: "POST",
             body: JSON.stringify({
@@ -347,7 +360,10 @@
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then((response) => response.json())
-        .then((json) => drawResult([json]));
+        .then((json) => {
+            drawResult([json])
+            tokens.innerText = tokens.innerText-1;
+        });
 
         //Get scan with values
         //Draw result with return
@@ -362,8 +378,8 @@
     }
     function main(){
         //Get from python
-        username.innerText = "BimBim"
-        tokens.innerText = 69
+        username.innerText = user
+        tokens.innerText = userTokens
         drawFetched([{ip:"192.168.77.224",ports:[22,80,25]},{ip:"192.168.77.1",ports:[80,443]}])
         //v---- Delete on production
         // drawResult([{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}}]);
