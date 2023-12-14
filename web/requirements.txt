@@ -1,5 +1,0 @@
-PyMySQL
-flask
-markupsafe
-python-dotenv
-ping3 == 4.0.4
