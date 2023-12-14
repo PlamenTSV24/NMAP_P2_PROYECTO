@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/api/static/resources/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="/api/static/css/main.css">
+    <title>Enymeep - Login</title>
+    <style>
+        #wrapper img{
+            margin: 80px auto;
+            /* position: relative; */
+            display: block;
+            filter: drop-shadow(5px 5px var(--shadow-low));
+        }
+        #login{
+            display: flex;
+            flex-direction: column;
+            width: 25vw;
+            margin: 20px auto 0 auto;
+            background-color: var(--container-bg);
+            color: white;
+            padding: 20px;
+            /* border-radius: .5rem; */
+            box-shadow: 10px 10px 0px var(--shadow-low);
+        }
+        #extra{
+            display: flex;
+            flex-direction: column;
+            max-height: 200px;
+            overflow-y: hidden;
+            transition: .5s max-height;
+        }
+        #messages{
+            transform: scaleY(0);
+            transition: transform .2s, margin .2s;
+            margin: 0;
+            overflow: hidden;
+        }
+        #messages.show{
+            transform: scaleY(1);
+            margin-bottom: 20px;
+        }
+        #login label{
+            margin: 15px 0 5px;
+        }
+        #cookies{
+            position: fixed;
+            bottom: 0px;
+            background-color: var(--input-bg);
+            color: white;
+            padding: 10px 20px 30px 20px;
+            width: 100vw;
+            text-align: center;
+            transition: .5s opacity;
+        }
+        #cookies input:nth-of-type(2){
+            margin-left: 20px;
+            background-color: var(--accent2);
+            transition: transform .3s, box-shadow .2s, text-shadow .2s, background-color .2s;
+            overflow: hidden;
+        }
+        .wiggle{
+            animation: linear .3s wiggle;
+
+        }
+        footer{
+            opacity: 0;
+            transition: opacity .5s;
+            visibility: hidden;
+        }
+        @keyframes wiggle {
+            0%{
+                transform: rotateZ(0deg);
+            }
+            15%{
+                transform: rotateZ(5deg);
+            }
+            40%{
+                transform: rotateZ(-10deg);
+            }
+            60%{
+                transform: rotateZ(20deg);
+            }
+            90%{
+                transform: rotateZ(-10deg);
+            }
+            100%{
+                transform: rotateZ(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- <h1>Bienvenido a enymeep</h1> -->
+        <img src="/api/static/resources/logo.png">
+        <form id="login" method="post" action="/register">
+            <label for="user">Username </label><input required class="text-input" type="text" name="username" id="user">
+            <label for="pwd">Password </label><input required class="text-input" type="password" name="password" id="pwd">
+            <div id="extra"></div>
+            <p class="link" onclick="loadForm()"></p>
+            <p id="messages"></p>
+            <input type="submit" value="">
+        </form>
+        <div id="cookies">
+            <p>Necesitamos usar las cookies para brindarte un mejor servicio, pero no te preocupes, no se las venderemos a terceros, nosotros tambien odiamos los anuncios</p>
+            <input type="button" value="Aceptar" onclick="closeCookies(this)"><input type="button" value="Rechazar" onclick="closeCookies(this)">
+        </div>
+    </div>
+    <footer>Enymeep by us <span id="date"></span></footer>
+</body>
+<script src="/api/static/js/common.js"></script>
+<script>
+    const wrapper = document.getElementById("wrapper")
+    const form = document.getElementById("login")
+    const extra = document.getElementById("extra")
+    const changeMode = form.getElementsByTagName("p")[0]
+    const submit = form.querySelectorAll("input[type=submit]")[0]
+    const message = document.getElementById("messages")
+    
+    async function showMessage(text,mode=1){
+        if (mode != 0){
+            form.classList.add("wiggle")
+            await sleep(350)
+            form.classList.remove("wiggle")
+        }
+        switch (mode) {
+            case 0:
+                mode="var(--correct)"
+            break;
+            case 1:
+                mode="var(--error)"
+            break;
+            case 2:
+                mode="var(--warn)"  
+            break;
+        }
+        message.style.color = mode
+        messages.innerText = text
+        messages.classList.add("show")
+        await sleep(4000)
+        messages.classList.remove("show")
+        await sleep(350)
+        messages.innerText = ""
+    }
+
+    function customFormHandler(e){
+        const endpoint = prepend+e.target.action.split("/").pop();
+        const data = new FormData(e.target);
+        if (endpoint == prepend+"register"){
+            if (data.get("password") != data.get("password2")){
+                showMessage("Password doesn't match")
+                return
+            }
+        }
+        sendForm(endpoint,JSON.stringify({
+                username: data.get("username"),
+                password: data.get("password"),
+            }))
+    }
+
+    async function loadForm(mode=""){
+        if (mode == ""){
+            mode = form.getAttribute("action")
+        }else{
+            mode="/"+mode
+        }
+        extra.style.maxHeight="0px"
+        await sleep(300)
+        extra.innerHTML=""
+        let textVal = "Don't have an account?"
+        if (mode == "/login"){
+            mode="/register"
+            textVal="Already have an account?"
+            extra.innerHTML="<label for='pwd2'>Repeat password </label><input class='text-input' type='password' required name='password2' id='pwd2'><div style='margin-top: 10px'><input name='eula' type='checkbox' required><label for='eula'>I agree with the terms and services</label></div>"
+        }else{
+            mode="/login"
+        }
+        extra.style.maxHeight="200px"
+        changeMode.innerText = textVal;
+        submit.value = mode.substring(1,)
+        form.setAttribute("action",mode)
+    }
+    async function closeCookies(item){
+        if (item.value == "Aceptar"){
+            item.value = "✓"
+            item.parentNode.style.opacity=0
+            await sleep(700)
+            item.parentNode.style.visibility="hidden"
+            document.getElementsByTagName("footer")[0].style.cssText="visibility:visible;opacity: 1;";
+        }
+        else{
+            item.value="✗";
+            item.classList.add("wiggle");
+            await sleep(350)
+            item.style.cssText = "transform: scale(0);";
+            await sleep(200)
+            item.style.display = "none";
+            item.classList.remove("wiggle");
+        }
+    }
+    async function main(){
+        await loadForm();
+        
+        // await showCookies();
+    }
+    window.onload = globalMain()
+</script>
+</html>

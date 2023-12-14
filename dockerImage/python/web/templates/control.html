@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="static/resources/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="static/css/main.css">
+    <title>Enymeep - Panel</title>
+    <style>
+        img{
+            width: 150px;
+            margin: 0px 0px 0px 240px;
+            padding: 10px 20px;
+            box-shadow: 6px 6px var(--shadow-mid);
+            background-color: var(--container-bg);
+            transition: .2s background-color, .2s box-shadow;
+        }
+        #nav img:hover{
+            background-color: var(--input-bg);
+            box-shadow: 5px 5px 5px var(--accent);
+        }
+        #nav{
+            z-index: 100;
+            display: flex;
+            position: fixed;
+            top: 0;
+            flex-direction: column;
+            max-width: 430px;
+            transform: translateX(-240px) translateY(-192px);
+            padding: 0 10px 10px 0;
+            margin: 0 -10px -10px 0;
+            overflow-x: hidden;
+            transition: transform .5s .5s, box-shadow .2s .5s, max-width .2s .6s, background-color .2s .93s;
+        }
+        #nav.openned{
+            box-shadow: 6px 6px var(--shadow-mid);
+            background-color: var(--container-bg);
+            transform: translateX(0) translateY(0);
+            max-width: 230px;
+            overflow-x: hidden;
+            transition: transform .5s .1s, box-shadow .2s .3s, max-width .2s .2s, background-color .2s;
+        }
+        #nav p{
+            margin: 20px 0 0 0;
+        }
+        #pwd-form{
+            font-size: .85rem;
+            z-index: -1;
+            width: 140px;
+            max-height: 0;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 39px;
+            left: 30px;
+            background-color: var(--accent);
+            color: black;
+            padding: 0 20px 10px 20px;
+            transition: .5s max-height;
+        }
+        #pwd-form.open{
+            max-height: 300px;
+        }
+        #pwd-form input[type="password"]{
+            margin: 0;
+            background-color: var(--active);
+            border: none;
+            box-shadow: 5px 5px var(--shadow-mid);
+        }
+        #pwd-form label{
+            margin: 12px 0 5px 0;
+            padding: 0;
+        }
+        #pwd-form input[type="submit"]{
+            margin-top: 20px;
+            background-color: var(--active);
+            box-shadow: 5px 5px var(--shadow-mid);
+        }
+        #pwd-form input[type="submit"]:hover{
+            background-color: white !important;
+        }
+        #access-pan{
+            background-color: var(--container-bg);
+            color: white;
+            width: 180px;
+            padding: 0px 30px 30px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        #access-pan *{
+            text-align: center;
+            margin-top: 20px;
+        }
+        #access-pan input{
+            padding: 5px 0;
+            z-index: 1;
+        }
+        #container{
+            position: relative;
+            margin: 0 auto;
+            top: 150px;
+            max-width: 50vw;
+            padding-bottom: 50px;
+            transition: max-width .5s;
+        }
+        #fetched,#custom,#result{
+            position: relative;
+            padding: 5px 10px;
+            background-color: rgba(0,0,0,.1);
+            margin: 10px 0;
+        }
+        #fetched h1,#custom h1, #result h1{
+            padding: 0 20px 0 10px;
+        }
+        #fetched-header span{
+            font-size: 1rem;
+        }
+        #fetched div, #result>div, #result .entry-name{
+            display: flex;
+            padding: 0 20px;
+            position: relative;
+        }
+        #fetched div, .entry-name{
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #fetched div:not(#fetched div:first-of-type),#result>div:not(#result>div:first-of-type){
+            border-top: 1px solid black;
+        }
+        #fetched div input, #result div input, #custom input[type="button"]{
+            margin: 10px;
+            position: absolute;
+            right: 0;
+            box-shadow: 3px 3px var(--shadow-mid);
+    
+        }
+        #fetched div p, #result div p{
+            width: 600px;
+            line-height: 57px;
+            margin: 0 0 0 15px;
+        }
+        #custom div{
+            position: relative;
+            padding: 0 20px 20px 20px;
+            display: flex;
+        }
+        #custom div form{
+            position: relative;
+        }
+        #custom input[type="text"]{
+            line-height: calc(2rem - 10px);
+            background-color: rgba(0,0,0,.1);
+            overflow-x: scroll;
+            color: black;
+            padding: 8px 0 5px 5px;
+            font-size: 16px;
+            width: 35%;
+            box-shadow: 4px 4px var(--shadow-mid);
+        }
+        #custom input[type="text"]:first-of-type{
+            margin-right: 7px;
+        }
+        #custom input[type="button"]{
+            margin: 0px;
+            right: 10px;
+        }
+        #result .entry-name{
+            padding: 0;
+        }
+        #result .entry{
+            flex-direction: column;
+            margin: 0 20px;
+        }
+        #result .entry .entry-name input{
+            right: -8px;
+        }
+        #result .entry-data{
+            padding: 0 20px;
+            max-height: 0;
+            display: flex;
+            transition: max-height ease-out .5;
+            overflow-x: hidden;
+        }
+        #result .entry-name .status{
+            padding-left: 10px;
+            text-shadow: 1px 1px var(--shadow-mid);
+        }
+        #result .entry-name .bold{
+            font-weight: bold;
+        }
+        #result .entry-data.show{
+            max-height: 100vh;
+            transition: max-height ease-out 2s;
+            flex-wrap: wrap;
+            background-color: rgba(0,0,0,.1);
+        }
+        #result .entry-data p{
+            white-space: nowrap;
+            width: auto;
+            margin-right: 30px;
+        }
+        @media only screen and (max-width: 1200px) {
+            #container {
+                max-width: 80vw;
+            }
+        }
+        @media only screen and (max-width: 804px){
+            #container {
+                max-width: 90vw;
+            }
+        }
+        @media only screen and (max-width: 733px){
+            #container {
+                max-width: 100vw;
+            }
+            #fetched div input, #result .entry-name input{
+                position: relative;
+                margin-top: 0;
+                max-height: 36px;
+            }
+            #fetched div p, .entry-name p{
+                text-align: center;
+                margin: 0;
+                line-height: 30px;
+            }
+            #custom div{
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            #custom div input[type="button"]{
+                position: relative;
+                margin: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="nav">
+            <div id="access-pan">
+                <p>User: <span id="username"></span> | 🪙 <span id="tokens"></span></p>
+                <input type="button" onclick="changePwd(this)" value="Reset Pwd">
+                <form action="password" method="post" id="pwd-form">
+                    <label for="pwd">Password:</label><input type="password" name="pwd">
+                    <label for="pwd2">Repeat Password:</label><input type="password" name="pwd2">
+                    <input type="submit" value="Change!">
+                </form>
+                <input type="button" onclick="logout()" value="Logout">
+            </div>
+            <img src="static/resources/logo_2.png">
+        </div>
+        <div id="container">
+            <div id="fetched">
+                <h1>Try with some safe IP's <span>(pssst,this ones are free)</span></h1>
+            </div>
+            <div id="custom">
+                <h1>Scan some ipzzz</h1>
+                <div>
+                    <input type="text" required size="14" class="text-input" name="ip" placeholder="127.0.0.1">
+                    <input type="text" required size="14" class="text-input" name="ports" placeholder="80,22,443">
+                    <input type="button" onclick="customWrapper(this)" value="Scan">
+                </div>
+            </div>
+            <div id="result">
+                <h1>Scan results</h1>
+            </div>
+        </div>
+    </div>
+    <footer>Enymeep by us <span id="date"></span></footer>
+</body>
+<script src="static/js/common.js"></script>
+<script>
+    const resultTable = document.getElementById("result")
+    const navItem = document.getElementById("nav")
+    const fetched = document.getElementById("fetched")
+    const pwdForm = document.getElementById("pwd-form")
+    const username = document.getElementById("username")
+    const tokens = document.getElementById("tokens")
+    const user = '{{user}}'
+    const userTokens = '{{tokens}}'
+    var menuOpen = 0;
+
+    navItem.addEventListener("click",async e =>{
+        if (menuOpen == 0){
+            navItem.getElementsByTagName("img")[0].classList.remove("wiggle")
+            menuOpen=1;
+            navItem.classList.add("openned")
+            await sleep(500);
+            menuOpen=2
+        }
+        async function closeMen(e){
+            if (! navItem.contains(e.target) && menuOpen == 2){
+                navItem.classList.remove("openned");
+                menuOpen=0;
+                document.removeEventListener("click", closeMen);
+            }
+        };
+        document.addEventListener("click", closeMen);
+    })
+    function logout(){
+        pwdForm.method = "GET"
+        let items = pwdForm.getElementsByTagName("input")
+        for (let x=0; x<=items.length; x++){
+            console.log(items[0])
+            items[0].remove()
+        }
+        pwdForm.action = prepend
+        pwdForm.submit()
+    }
+    function changePwd(button){
+        pwdForm.style.zIndex = "2"
+        pwdForm.classList.add("open")
+        menuOpen=3
+        async function closePwd(e){
+            if (e.target != button && ! pwdForm.contains(e.target)){
+                pwdForm.classList.remove("open")
+                await sleep(500)
+                pwdForm.style.zIndex = "0"
+                menuOpen=2
+                document.removeEventListener("click", closePwd);
+            }
+        };
+        document.addEventListener("click", closePwd);
+    }
+    function customFormHandler(e){
+        const endpoint = prepend+e.target.action.split("/").pop();
+        const data = new FormData(e.target);
+        if (endpoint == prepend+"password"){
+            if (data.get("pwd") != data.get("pwd2")){
+                showMessage("Password doesn't match")
+                return
+            }
+        }
+        sendForm(endpoint,JSON.stringify({
+                pwd: data.get("pwd"),
+            }))
+    }
+    async function showMessage(message,mode){
+        var btn = pwdForm.getElementsByTagName("input")[2];
+        btn.value = message;
+        await sleep(4000)
+        document.body.click()
+        btn.value = "Change!"
+
+    }
+    function showPorts(entry){
+        entry = entry.parentNode.parentNode.getElementsByClassName("entry-data")[0]
+        entry.classList.toggle("show")
+    }
+    function drawResult(dataArray){
+        if (dataArray === undefined || dataArray.len == 0){
+            resultTable.innerHTML += "<div><p>Can't show data if there is none</p></div>"
+            return
+        }
+        dataArray.forEach(entry =>{
+            console.log(entry)
+            const item = document.createElement("div")
+            item.classList = "entry"
+            status=""
+            if (entry.status == "Down"){
+                item.innerHTML = `<div class='entry-name'><p><span><span class="bold">IP: </span>${entry.ip}</span> <span><span class="bold">Ports: </span>${entry.ports.map(a => a.port)}</span></p><input type='button' disabled value='Down'></div>`
+            }else{
+                item.innerHTML=`<div class='entry-name'><p><span><span class="bold">IP: </span>${entry.ip}</span> <span><span class="bold">Ports: </span>${entry.ports.map(a => a.port)}</span></p><input type='button' onclick='showPorts(this)' data-object='${JSON.stringify(entry)}' value='Show'></div>`
+                const container = document.createElement("div")
+                container.classList = "entry-data"
+                entry.ports.forEach(port =>{
+                    const portNode = document.createElement("p")
+                    portNode.innerHTML =`Port: ${port.port} Status: ${port.status}`
+                    container.appendChild(portNode)
+                })
+                item.appendChild(container)
+            }
+            resultTable.appendChild(item)
+        })
+    }
+    function customWrapper(target){
+        const childs = target.parentNode.getElementsByTagName("input")
+        const values = [childs[0].value,childs[1].value]
+        var valid = true
+        target.disabled = false
+        async function invalidToggle(target){
+            target.classList.add("error")
+            target.value = "Empty value!!"
+            await sleep(4000)
+            target.value = "Scan"
+            target.classList.remove("error")
+        }
+        values.forEach(val =>{
+            if (val == ""){
+                invalidToggle(target)
+                valid = false
+                return
+            }
+        })
+        if (valid){
+            sendScan(target,values)
+        }
+    }
+    function sendScan(target,defvalues=null){
+        var values = []
+        var free = false
+        if (defvalues != null){
+            values = defvalues
+        }else if (target instanceof HTMLInputElement) {
+            let pelement = target.parentNode.getElementsByTagName("p")[0].innerText.split(" ");
+            target.disabled = true
+            values.push(pelement[1],pelement[3])
+            free=true
+        }
+        async function workingAnimate(target){
+            console.log("Animating")
+            const frames = ["\/","-","\\","|"]
+            let f = 0
+            while (target.disabled){
+                if (f+1 >= frames.length){
+                    f=0
+                }else{
+                    f++
+                }
+                target.value = frames[f]
+                await sleep(700)
+            }
+            target.value="Go!"
+        }
+        workingAnimate(target)
+        fetch("enymeep", {
+            method: "POST",
+            body: JSON.stringify({
+                address: values[0],
+                ports: values[1],
+                free: free
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then((response) => {
+            target.disabled = false
+            return response.json()
+        })
+        .then((json) => {
+            drawResult([json])
+            if (!free){
+                tokens.innerText = tokens.innerText-1;
+            }
+        });
+    }
+    function drawFetched(items){
+        let c=0
+        items.forEach(item => {
+            const row = document.createElement("div")
+            row.innerHTML = `<p>IP: ${item.ip}  Ports: ${item.ports}</p><input type='button' onclick='sendScan(this)' value='Go!'>`
+            fetched.appendChild(row)
+        })
+    }
+    function main(){
+        //Get from python
+        username.innerText = user
+        tokens.innerText = userTokens
+        drawFetched([{ip:"192.168.77.224",ports:[22,80,25]},{ip:"192.168.77.1",ports:[80,443]}])
+        //v---- Delete on production
+        // drawResult([{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}},{ip:"192.168.77.224",ports:{22:"Open",23:"Closed"}}]);
+    }
+    window.onload=globalMain()
+</script>
+</html>

@@ -9,8 +9,8 @@ services:
       MARIADB_USER: agente
       MARIADB_USER_PASSWORD: MiClave
       MARIADB_DATABASE: NMAP
-    # volumes:
-    #   - ./datos:/var/lib/mysql
+    volumes:
+      - ./dockerImage/mariadb:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
   phpmyadmin:
@@ -23,3 +23,16 @@ services:
       - 9093:80
     depends_on:
       - mariadb
+  python:
+    container_name: app
+    build: ./dockerImage/python
+  apache:
+    container_name: apache
+    image: httpd:latest
+    ports:
+     - 8080:80
+    volumes:
+     - ./dockerImage/apache/static:/usr/local/apache2/htdocs
+     - ./dockerImage/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+     - ./dockerImage/apache/reverse.conf:/usr/local/apache2/conf/sites/reverse.conf
+

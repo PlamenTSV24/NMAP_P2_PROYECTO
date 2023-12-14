@@ -1,0 +1,100 @@
+:root{
+    --shadow-low: #0000002d;
+    --shadow-mid: #0000005e;
+    --background: #a8fce0;
+    --accent: #35ff90;
+    --accent-disabled: #8fceab;
+    --accent2: #daff35;
+    --active: #aeffd3;
+    --input-bg: #414141;
+    --container-bg: #252525;
+    --warn: #ffff4b;
+    --error: #ff4040;
+    --error2: #ff7e7e;
+    --correct: #57ff57;
+}
+
+@font-face {
+    font-family: Monocraft;
+    src: url('../resources/Monocraft.ttf');
+}
+@font-face {
+    font-family: Minecraft;
+    src: url('../resources/Minecraft.otf');
+}
+body,html,#wrapper{
+    font-family: Minecraft;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background);
+}
+input{
+    font-family: Monocraft;
+    transition: .2s box-shadow, .2s text-shadow,background-color .2s;
+}
+img{
+   --user-drag: none;
+    --webkit-user-drag: none;
+    --user-select: none;
+    --moz-user-select: none;
+    --webkit-user-select: none;
+    --ms-user-select: none;
+}
+.text-input{
+    font-family: Minecraft;
+    /* border-radius: .5rem; */
+    background-color: var(--input-bg);
+    border: none;
+    color: var(--accent);
+    padding: 5px;
+}
+input[type="submit"],#cookies input, input[type="button"]{
+    background-color: var(--accent);
+    padding: 2px 20px;
+    border: none;
+    /* border-radius: .5rem; */
+    text-transform: capitalize;
+    line-height: 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+input[type="button"]:hover{
+    box-shadow: 5px 5px var(--shadow-mid) !important;
+}
+input[type="submit"]:hover,input[type="button"]:hover{
+    text-shadow: 3px 3px var(--shadow-low);
+    background-color: var(--active) !important;
+
+}
+input[type="button"].error{
+    background-color: var(--error);
+}
+input[type="button"].error:hover{
+    background-color: var(--error2);
+}
+footer{
+    position: fixed;
+    bottom: 0px;
+    background-color:var(--accent);
+    width: 100vw;
+    text-align: center;
+    padding: 5px 0;
+}
+.link{
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color .1s;
+}
+.link:hover{
+    color: var(--active)
+}
+input:disabled{
+    background-color: var(--accent-disabled);
+}
+input:disabled:hover{
+    text-shadow: none;
+    box-shadow: 3px 3px var(--shadow-mid) !important;
+    cursor: not-allowed;
+    background-color: var(--accent-disabled) !important;
+}
