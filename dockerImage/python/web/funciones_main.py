@@ -1,7 +1,7 @@
 from __future__ import print_function
 from __main__ import app
 from flask import render_template, session,request
-from funciones_db import verificar_credenciales,verificar_usuario,registrar_usuario,restar_token,cambiar_pass
+from funciones_db import verificar_credenciales,verificar_usuario,registrar_usuario,restar_token,cambiar_pass,borrar_usuario
 from enymeep import scanTarget
 
 
@@ -62,14 +62,22 @@ def password():
     usuario = session.get("usuario")
     pwd = requestBody["pwd"]
     res = False
-    print(pwd)
-    print(usuario)
     if usuario is not None and pwd != "":
         res = cambiar_pass(usuario,pwd)
     if res:
         res={"status": 200 , "mensaje":"Okay!!"}
     else:
         res={"status": 406 , "mensaje":"Error :("}
+    return res
+
+@app.route("/delete",methods=['POST'])
+def delete():
+    usuario = session.get("usuario")
+    res = borrar_usuario(usuario)
+    if res:
+        res={"status": 200 , "mensaje":"Deleted"}
+    else:
+        res={"status": 406 , "mensaje":"Error >:("}
     return res
 
 
@@ -82,3 +90,9 @@ def enymeep():
         restar_token(session.get("usuario"))
     res = scanTarget(requestBody['address'], requestBody['ports'])
     return res
+
+@app.route("/calculariva", methods=["GET"])
+def calculariva(valor=0):
+    if valor == 0:
+        valor = request.args.get('valor', default = 1, type = int)
+    return {"status": 200 , "resultado":valor*0.21}

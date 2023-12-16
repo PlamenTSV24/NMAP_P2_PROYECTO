@@ -11,8 +11,8 @@ services:
       MARIADB_DATABASE: NMAP
     volumes:
       - ./dockerImage/mariadb:/docker-entrypoint-initdb.d
-    ports:
-      - 3306:3306
+    expose:
+      - "3306"
   phpmyadmin:
     image: phpmyadmin
     container_name: phpmyadmin
@@ -30,7 +30,7 @@ services:
     container_name: apache
     image: httpd:latest
     ports:
-     - 8080:80
+     - 7777:80
     volumes:
      - ./dockerImage/apache/static:/usr/local/apache2/htdocs
      - ./dockerImage/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf

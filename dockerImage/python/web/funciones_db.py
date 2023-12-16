@@ -85,9 +85,9 @@ def cambiar_pass(usuario,nueva):
     nueva = obtener_hash(nueva)
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    res = False
     query = "UPDATE usuarios SET pass = %s WHERE usuario = %s"
     cursor.execute(query, (nueva,usuario))
+    res = False
     try:
         conexion.commit()
         res=True
@@ -104,7 +104,12 @@ def borrar_usuario(usuario):
     query = "DELETE FROM usuarios WHERE usuario = %s"
 
     cursor.execute(query, (usuario,))
-    conexion.commit()
-
+    res = False
+    try:
+        conexion.commit()
+        res=True
+    except:
+        pass
     cursor.close()
     conexion.close()
+    return res
