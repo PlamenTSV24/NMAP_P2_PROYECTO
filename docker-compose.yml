@@ -26,6 +26,16 @@ services:
   python:
     container_name: app
     build: ./dockerImage/python
+    environment:
+      DB_USERNAME: root
+      DB_PASSWORD: example
+      DB_DATABASE: NMAP
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      PORT: 8080
+      HOST: 0.0.0.0
+      SECRET_KEY: 1337-H4xx0ry-0v3r-H3r3
+      SALT: flotante
   apache:
     container_name: apache
     image: httpd:latest
