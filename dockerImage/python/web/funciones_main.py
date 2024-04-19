@@ -1,6 +1,6 @@
 from __future__ import print_function
 from __main__ import app
-from flask import render_template, session,request, jsonify
+from flask import render_template, session,request, jsonify, request
 from funciones_db import verificar_credenciales,verificar_usuario,registrar_usuario,restar_token,cambiar_pass,borrar_usuario
 from enymeep import scanTarget
 import datetime
@@ -8,6 +8,7 @@ from werkzeug.http import http_date
 import bleach
 import logging
 import jwt
+import os
 
 logging.basicConfig(level="INFO")
 
@@ -73,6 +74,42 @@ def login():
     logging.info(f"Login from user {username}: {res['mensaje']}")
     
     return jsonify(res)
+#SUBIDA DE ARCHIVOS
+
+UPLOAD_FOLDER = 'uploads/'
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'pdf', 'docx'}
+
+def allowed_file(filename):
+    """Verifica si el archivo tiene una extensión permitida."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # Verifica si se recibió un archivo en la solicitud
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+    
+    # Verifica si el archivo tiene un nombre válido
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    # Verifica si el archivo tiene una extensión permitida
+    if allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        return jsonify({'message': 'File uploaded successfully', 'filename': filename}), 200
+    else:
+        return jsonify({'error': 'File type not allowed'}), 400
 
 @app.route("/dashboard",methods=['POST'])
 def dashboard():
