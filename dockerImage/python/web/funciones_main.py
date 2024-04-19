@@ -1,21 +1,25 @@
 from __future__ import print_function
 from __main__ import app
-from flask import render_template, session,request
+from flask import render_template, session,request, jsonify
 from funciones_db import verificar_credenciales,verificar_usuario,registrar_usuario,restar_token,cambiar_pass,borrar_usuario
 from enymeep import scanTarget
 import datetime
 from werkzeug.http import http_date
 import bleach
 import logging
+import jwt
 
 logging.basicConfig(level="INFO")
+
+SECRET_KEY = app.config.get('SECRET_KEY')
 
 @app.route("/",methods=['GET'])
 def raiz():
     session.clear()
     return render_template('access.html')
 
-
+#LOGIN ANTES DE JWT
+"""
 @app.route("/login",methods=['GET', 'POST'])
 def login():
     requestLogin = request.get_json()
@@ -35,6 +39,40 @@ def login():
     #     res={"status": 406, "mensaje" : "An error has occurred while loading session"}
 
     return res
+"""
+#LOGIN CON JWT
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    requestLogin = request.get_json()
+    username = bleach.clean(requestLogin['username'])
+    password = bleach.clean(requestLogin['password'])
+    
+    # Verifica las credenciales del usuario
+    username_bd = verificar_credenciales(username, password)
+    if username_bd is False:
+        res = {"status": 406, "mensaje": "Invalid username or password"}
+    else:
+        session["usuario"] = username
+        session["tokens"] = username_bd
+
+        # Genera un token JWT
+        token = jwt.encode({
+            'user': username,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Define el tiempo de expiración
+        }, SECRET_KEY, algorithm='HS256')
+        
+        # Devuelve el token y el destino
+        res = {
+            "status": 301,
+            "mensaje": "Login correct",
+            "target": "/dashboard",
+            "token": token
+        }
+    
+    logging.info(f"Login from user {username}: {res['mensaje']}")
+    
+    return jsonify(res)
 
 @app.route("/dashboard",methods=['POST'])
 def dashboard():
