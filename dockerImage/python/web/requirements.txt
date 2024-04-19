@@ -6,4 +6,4 @@ ping3 == 4.0.4
 bleach
 Flask-WTF
 pyopenssl
-jwt
+PyJWT

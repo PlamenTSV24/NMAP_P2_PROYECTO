@@ -1,0 +1,6 @@
+[mariadbd]
+# SSL
+ssl-ca=/etc/ssl-certs/ca.pem
+ssl-cert=/etc/ssl-certs/server-cert.pem
+ssl-key=/etc/ssl-certs/server-key.key
+require-secure-transport = on

@@ -10,7 +10,7 @@ import logging
 import jwt
 import os
 
-logging.basicConfig(level="INFO")
+logging.basicConfig(level="INFO", filename="enymeep.log")
 
 SECRET_KEY = app.config.get('SECRET_KEY')
 

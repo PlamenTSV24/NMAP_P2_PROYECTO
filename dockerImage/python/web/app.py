@@ -16,4 +16,4 @@ import database
 if __name__ == '__main__':
     port = int(os.environ.get('PORT'))
     host = os.environ.get('HOST')
-    app.run(host=host, port=port) #Añadir , ssl_context='adhoc' para https
+    app.run(host=host, port=port, ssl_context=('/etc/ssl-certs/server-cert.pem', '/etc/ssl-certs/server-key.pem'))

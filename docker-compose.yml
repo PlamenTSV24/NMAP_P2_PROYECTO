@@ -10,7 +10,9 @@ services:
       MARIADB_USER_PASSWORD: MiClave
       MARIADB_DATABASE: NMAP
     volumes:
-      - ./dockerImage/mariadb:/docker-entrypoint-initdb.d
+      - ./dockerImage/mariadb/entry:/docker-entrypoint-initdb.d
+      - ./dockerImage/mariadb/config/99-ssl.cnf:/etc/mysql/mariadb.conf.d/99-ssl.cnf:ro
+      - ./dockerImage/ssl:/etc/ssl-certs/
     expose:
       - "3306"
   phpmyadmin:
@@ -35,14 +37,15 @@ services:
       PORT: 8080
       HOST: 0.0.0.0
       SECRET_KEY: 1337-H4xx0ry-0v3r-H3r3
-      SALT: flotante
+    volumes:
+      - ./dockerImage/ssl:/etc/ssl-certs/
   apache:
     container_name: apache
     image: httpd:latest
     ports:
-     - 7777:80
+     - 7777:443
     volumes:
      - ./dockerImage/apache/static:/usr/local/apache2/htdocs
      - ./dockerImage/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
      - ./dockerImage/apache/reverse.conf:/usr/local/apache2/conf/sites/reverse.conf
-
+     - ./dockerImage/ssl:/etc/ssl-certs/

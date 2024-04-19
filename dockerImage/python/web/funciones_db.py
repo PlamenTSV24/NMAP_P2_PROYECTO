@@ -1,9 +1,33 @@
 import pymysql
 import hashlib
 from database import obtener_conexion
+from os import urandom
 
-def obtener_hash(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+def gen_salt():
+    caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
+    bytes_aleatorios = urandom(16)
+    salt = ''.join(caracteres[b % len(caracteres)] for b in bytes_aleatorios)
+    return salt
+
+def obtener_hash(password, salt=None, usuario=None):
+    if usuario is not None:
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+        query = "SELECT salt from usuarios WHERE usuario = %s"
+        cursor.execute(query, (usuario,))
+        resultado = cursor.fetchone()
+        salt = resultado[0]
+        if salt is None:
+                salt = gen_salt()
+                query = "UPDATE usuarios SET salt = %s WHERE usuario = %s"
+                cursor.execute(query, (salt,usuario))
+                conexion.commit()
+        cursor.close()
+        conexion.close()
+    if salt is None:
+        return hashlib.sha256(password.encode()).hexdigest()
+    else:
+        return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
 
 def obtener_ip_por_nombre(nombre_maquina):
     conexion = obtener_conexion()
@@ -25,12 +49,11 @@ def obtener_ip_por_nombre(nombre_maquina):
 def registrar_usuario(usuario, password):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
+    salt = gen_salt()
+    password_hasheada = obtener_hash(password, salt)
+    query = "INSERT INTO usuarios (usuario, pass, salt, tokens) VALUES (%s, %s, %s, 30)"
 
-    password_hasheada = obtener_hash(password)
-    
-    query = "INSERT INTO usuarios (usuario, pass, tokens) VALUES (%s, %s, 30)"
-
-    cursor.execute(query, (usuario, password_hasheada))
+    cursor.execute(query, (usuario, password_hasheada, salt))
     conexion.commit()
 
     cursor.close()
@@ -65,7 +88,7 @@ def verificar_credenciales(usuario, password):
     if resultado:
 
         password_hasheada_bd = resultado[0]
-        password_hasheada_ingresada = obtener_hash(password) 
+        password_hasheada_ingresada = obtener_hash(password, None, usuario) 
 
         if password_hasheada_bd == password_hasheada_ingresada:
             result = resultado[1]
@@ -82,7 +105,7 @@ def restar_token(usuario):
     conexion.close()
 
 def cambiar_pass(usuario,nueva):
-    nueva = obtener_hash(nueva)
+    nueva = obtener_hash(nueva, None, usuario)
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     query = "UPDATE usuarios SET pass = %s WHERE usuario = %s"
