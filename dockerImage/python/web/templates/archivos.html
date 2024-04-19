@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/api/static/resources/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="/api/static/css/main.css">
+    <title>Enymeep - File Upload</title>
+    <style>
+        #upload-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 50vw;
+            margin: 20px auto;
+            background-color: var(--container-bg);
+            color: white;
+            padding: 20px;
+            box-shadow: 10px 10px 0px var(--shadow-low);
+        }
+        
+        #upload-form label {
+            margin: 15px 0 5px;
+        }
+
+        #upload-form input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        #upload-form input[type="submit"] {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #upload-form input[type="submit"]:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        #upload-message {
+            margin-top: 10px;
+            color: var(--error);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <img src="/api/static/resources/logo.png" alt="Enymeep Logo">
+
+        <div id="upload-wrapper">
+            <h2>Secure File Upload</h2>
+            <form id="upload-form" method="post" action="/upload" enctype="multipart/form-data">
+                <label for="file">Choose file to upload:</label>
+                <input type="file" id="file" name="file" accept=".jpg, .png, .pdf, .docx" required>
+                <input type="submit" value="Upload">
+            </form>
+            <p id="upload-message"></p>
+        </div>
+
+        <footer>Enymeep by us</footer>
+    </div>
+
+    <script src="/api/static/js/common.js"></script>
+    <script>
+        const form = document.getElementById('upload-form');
+        const uploadMessage = document.getElementById('upload-message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    uploadMessage.style.color = 'var(--correct)';
+                    uploadMessage.textContent = data.message;
+                } else {
+                    uploadMessage.style.color = 'var(--error)';
+                    uploadMessage.textContent = data.error;
+                }
+            } catch (error) {
+                uploadMessage.style.color = 'var(--error)';
+                uploadMessage.textContent = 'Fallo al subir el archivo';
+            }
+        });
+    </script>
+</body>
+
+</html>
